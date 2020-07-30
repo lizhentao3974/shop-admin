@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC
+        "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fh.shop.admin.mapper.goods.IGoodsCommonMapper">
+
+    <select id="findGoodsCount" parameterType="com.fh.shop.admin.param.goods.GoodsSearchParam" resultType="long">
+        select count(*) from t_goods_common
+        <include refid="queryLimit"></include>
+    </select>
+
+    <sql id="queryLimit">
+        <where>
+            <if test="productName != null and productName != ''">
+                productName like concat('%',#{productName},'%')
+            </if>
+            <if test="brandId != null and brandId != -1">
+                and brandId = #{brandId}
+            </if>
+        </where>
+    </sql>
+
+    <select id="findGoodsList" parameterType="com.fh.shop.admin.param.goods.GoodsSearchParam"
+            resultType="com.fh.shop.admin.po.goods.GoodsCommon">
+        select t.* from (
+        select id, productName,price, stock, brandName,
+        cateName, status, isHot,mainImage from t_goods_common
+        <include refid="queryLimit"></include>
+        order by id desc
+        ) t limit #{start},#{length}
+
+    </select>
+</mapper>

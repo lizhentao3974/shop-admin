@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Title</title>
+    <style>
+        body {
+            font-family: simhei;
+        }
+    </style>
+</head>
+<body>
+<table border="1px" cellspacing="0px" cellpadding="0px" width="500px">
+    <tr>
+        <td>商品名</td>
+        <td>价格</td>
+        <td>品牌</td>
+    </tr>
+    <#list product as p>
+    <tr>
+        <td>${p.productName}</td>
+        <td>${p.price}</td>
+        <td>${p.brandName}</td>
+    </tr>
+</
+#list>
+</table>
+</body>
+</html>

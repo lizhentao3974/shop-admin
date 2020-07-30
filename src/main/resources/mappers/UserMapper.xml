@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC
+        "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fh.shop.admin.mapper.user.IUserMapper">
+    <sql id="queryUserParam">
+        <where>
+            <if test="userName != null and userName != ''">
+                userName like concat('%',#{userName},'%')
+            </if>
+            <if test="realName != null and realName != ''">
+                and realName like concat('%',#{realName},'%')
+            </if>
+            <if test="minBirthday != null">
+                and birthday >= #{minBirthday}
+            </if>
+            <if test="maxBirthday != null">
+                and birthday &lt;= #{maxBirthday}
+            </if>
+            <if test="provincialId != null and provincialId != -1">
+                and provincial = #{provincialId}
+            </if>
+            <if test="cityId != null and cityId != -1">
+                and city = #{cityId}
+            </if>
+            <if test="countyId != null and countyId != -1">
+                and county = #{countyId}
+            </if>
+        </where>
+    </sql>
+
+    <select id="queryUserCount" parameterType="com.fh.shop.admin.param.user.UserSearchParam" resultType="long">
+        select count(*) from t_user
+        <include refid="queryUserParam"></include>
+    </select>
+
+    <select id="queryUserList" parameterType="com.fh.shop.admin.param.user.UserSearchParam"
+            resultType="com.fh.shop.admin.po.user.User">
+        select t.* from (
+
+        select u.id, u.userName,a1.areaName "provincialName",a2.areaName "cityName",a3.areaName "countyName",
+        u.realName,u.userImage,u.sex,u.birthday,u.telePhone,u.email from t_user u
+
+        left join t_area a1 on u.provincial = a1.id
+
+        left join t_area a2 on u.city = a2.id
+
+        left join t_area a3 on u.county = a3.id
+
+        <include refid="queryUserParam"></include>
+
+        order by u.id desc
+        ) t
+        limit #{start},#{length}
+    </select>
+
+    <insert id="addUser" parameterType="com.fh.shop.admin.po.user.User">
+        insert into t_user(userName,password,realName,userImage,sex,birthday,telePhone,email,provincial,city,county)
+        values
+        (#{userName},#{password},#{realName},#{userImage},#{sex},#{birthday},#{telePhone},#{email},#{provincial},#{city},#{county})
+    </insert>
+    <delete id="deleteUser" parameterType="long">
+        delete from t_user where id = #{id}
+    </delete>
+
+    <select id="editUser" parameterType="long" resultType="com.fh.shop.admin.po.user.User">
+        select u.id, u.userName,a1.areaName "provincialName",a2.areaName "cityName",a3.areaName "countyName",
+        u.realName,u.userImage,u.sex,u.birthday,u.telePhone,u.email,u.provincial,u.city,u.county from t_user u
+
+        left join t_area a1 on u.provincial = a1.id
+
+        left join t_area a2 on u.city = a2.id
+
+        left join t_area a3 on u.county = a3.id
+        where u.id = #{id}
+    </select>
+
+    <update id="updateUser" parameterType="com.fh.shop.admin.po.user.User">
+        update t_user set userName=#{userName},realName=#{realName},userImage=#{userImage},
+        sex=#{sex},birthday=#{birthday},telePhone=#{telePhone},email=#{email},provincial = #{provincial},
+        city=#{city},county=#{county} where
+        id = #{id}
+    </update>
+
+    <delete id="deleteUsers">
+        delete from t_user where id in
+        <foreach collection="list" open="(" close=")" separator="," item="ids">
+            #{ids}
+        </foreach>
+    </delete>
+
+    <select id="findUserParam" parameterType="com.fh.shop.admin.param.user.UserSearchParam"
+            resultType="com.fh.shop.admin.po.user.User">
+        select u.id, u.password,u.userName,a1.areaName "provincialName",a2.areaName "cityName",a3.areaName "countyName",
+
+        u.realName,u.userImage,u.sex,u.birthday,u.telePhone,u.email from t_user u
+
+        left join t_area a1 on u.provincial = a1.id
+
+        left join t_area a2 on u.city = a2.id
+
+        left join t_area a3 on u.county = a3.id
+
+        <include refid="queryUserParam"></include>
+
+        order by u.id desc
+    </select>
+
+    <select id="findUserByName" parameterType="string" resultType="com.fh.shop.admin.po.user.User">
+        select id,userName,password,realName,userImage,sex,birthday,
+
+        loginDate,telePhone,email,loginCount from t_user where username = #{v}
+    </select>
+
+    <update id="updateUserLoginDate">
+        update t_user set loginDate = #{date} where id = #{userId}
+    </update>
+
+    <update id="updateLoginCount" parameterType="long">
+        update t_user set loginCount = 1 where id = #{v}
+    </update>
+
+    <update id="incrLoginCount" parameterType="long">
+        update t_user set loginCount = loginCount + 1 where id = #{v}
+    </update>
+</mapper>

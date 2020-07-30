@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC
+        "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fh.shop.admin.mapper.product.IProductMapper">
+
+    <sql id="queryLimit">
+        <where>
+            <if test="productName != null and productName != ''">
+                productname like concat('%',#{productName},'%')
+            </if>
+            <if test="minPrice != null">
+                and price >= #{minPrice}
+            </if>
+            <if test="maxPrice != null">
+                and price &lt;= #{maxPrice}
+            </if>
+            <if test="brandId != null and brandId != -1">
+                and brandId = #{brandId}
+            </if>
+            <if test="minCreateDate != null">
+                and createDate >= #{minCreateDate}
+            </if>
+            <if test="maxCreateDate != null">
+                and createDate &lt;= #{maxCreateDate}
+            </if>
+            <if test="one != null and one != -1">
+                and one = #{one}
+            </if>
+            <if test="two != null and two != -1">
+                and two = #{two}
+            </if>
+            <if test="three != null and three != -1">
+                and three = #{three}
+            </if>
+        </where>
+    </sql>
+    <sql id="productWhere">
+        <where>
+            <if test="productName != null and productName != ''">
+                productname like concat('%',#{productName},'%')
+            </if>
+            <if test="minPrice != null">
+                and price >= #{minPrice}
+            </if>
+            <if test="maxPrice != null">
+                and price &lt;= #{maxPrice}
+            </if>
+            <if test="brandId != null and brandId != -1">
+                and brandId = #{brandId}
+            </if>
+            <if test="minCreateDate != null">
+                and createDate >= #{minCreateDate}
+            </if>
+            <if test="maxCreateDate != null">
+                and createDate &lt;= #{maxCreateDate}
+            </if>
+        </where>
+    </sql>
+    <select id="queryCount" parameterType="com.fh.shop.admin.param.product.ProductSearchParam" resultType="long">
+        select count(*) from t_product p left join t_brand b on p.brandId = b.id
+        <include refid="queryLimit"></include>
+    </select>
+
+    <select id="queryProduct" parameterType="com.fh.shop.admin.param.product.ProductSearchParam"
+            resultType="com.fh.shop.admin.po.product.Product">
+        select t.* from (
+
+        select p.id,p.productName,p.price,b.brandName,p.brandId,
+
+        p.createDate,p.inputDate,p.modificationDate,p.imgFile,p.isHot,
+
+        p.whether,t1.typeName "oneTypeName",t2.typeName "twoTypeName",
+
+        t3.typeName "threeTypeName" from t_product p
+
+        left join t_type t1 on p.one = t1.id
+
+        left join t_type t2 on p.two = t2.id
+
+        left join t_type t3 on p.three = t3.id
+
+        left join t_brand b on p.brandId = b.id
+
+        <include refid="queryLimit"></include>
+
+        order by p.id desc
+
+        ) t
+        limit #{start},#{length};
+    </select>
+
+
+    <select id="editProduct" parameterType="long" resultType="com.fh.shop.admin.po.product.Product">
+        select p.id,p.productName,p.price,b.brandName,p.brandId,p.one,p.two,p.three,
+
+        p.createDate,p.inputDate,p.modificationDate,p.imgFile,p.isHot,
+
+        p.whether,t1.typeName "oneTypeName",t2.typeName "twoTypeName",
+
+        t3.typeName "threeTypeName" from t_product p
+
+        left join t_type t1 on p.one = t1.id
+
+        left join t_type t2 on p.two = t2.id
+
+        left join t_type t3 on p.three = t3.id
+
+        left join t_brand b on p.brandId = b.id
+
+        where p.id = #{id}
+    </select>
+
+    <select id="findProduct" parameterType="com.fh.shop.admin.param.product.ProductSearchParam"
+            resultType="com.fh.shop.admin.po.product.Product">
+        select p.id,p.productName,p.price,b.brandName,p.brandId,
+
+        p.createDate,p.inputDate,p.modificationDate,p.imgFile,p.isHot,
+
+        p.whether from t_product p left join t_brand b on p.brandId = b.id
+
+        <include refid="productWhere"></include>
+
+        order by p.id desc
+
+    </select>
+
+</mapper>

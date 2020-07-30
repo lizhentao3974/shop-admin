@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC
+        "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fh.shop.admin.mapper.category.ICategoryMapper">
+
+    <select id="findTypeByFid" parameterType="long" resultType="com.fh.shop.admin.po.type.Type">
+        select id,typeName,fid from t_type where fid = #{v}
+    </select>
+
+    <insert id="addType" parameterType="com.fh.shop.admin.po.type.Type">
+        <selectKey keyProperty="id" resultType="long" order="AFTER">
+            select last_insert_id()
+        </selectKey>
+        insert into t_type(typeName,fid) values (#{typeName},#{fid})
+    </insert>
+
+    <select id="findType" parameterType="long" resultType="com.fh.shop.admin.po.type.Type">
+        select id,typeName,fid from t_type where id = #{v};
+    </select>
+
+    <update id="updateCateName">
+        update t_goods_common set cateName = replace(cateName,
+        concat('|',#{oldCategoryName},'|'),concat('|',#{categoryName},'|'))
+
+        where cateName like concat('%|',#{oldCategoryName},'|%')
+    </update>
+
+</mapper>

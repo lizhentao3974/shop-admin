@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC
+        "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.fh.shop.admin.mapper.brand.IBrandMapper">
+    <insert id="addBrand1" parameterType="com.fh.shop.admin.po.brand.Brand">
+        insert into t_brand(brandName) values (#{brandName})
+        <selectKey order="AFTER" keyProperty="id" resultType="long">
+            select last_insert_id()
+        </selectKey>
+    </insert>
+
+    <select id="queryBrandCount" resultType="long" parameterType="com.fh.shop.admin.param.brand.BrandSearchParam">
+        select count(*) from t_brand
+    </select>
+
+    <select id="queryBrandList" parameterType="com.fh.shop.admin.param.brand.BrandSearchParam"
+            resultType="com.fh.shop.admin.po.brand.Brand">
+        select t.* from (
+        select id,brandName,logo,isRecommend,sort from t_brand
+        order by sort
+        ) t
+        limit #{start},#{length}
+    </select>
+
+    <delete id="deleteBrand" parameterType="long">
+        delete from t_brand where id = #{value}
+    </delete>
+    <update id="updateBrand" parameterType="com.fh.shop.admin.po.brand.Brand">
+        update t_brand set brandName = #{brandName},logo = #{logo} where id = #{id}
+    </update>
+
+    <select id="querySelectBrand" resultType="com.fh.shop.admin.po.brand.Brand">
+        select id,brandName from t_brand
+    </select>
+
+    <select id="queryBrandById" parameterType="long" resultType="com.fh.shop.admin.po.brand.Brand">
+        select brandName,logo from t_brand where id = #{a}
+    </select>
+
+    <select id="queryBrandIdByName" parameterType="string" resultType="long">
+        select id from t_brand where brandName = #{v}
+    </select>
+</mapper>
